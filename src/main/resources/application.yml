@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: event-reliability-platform
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+platform:
+  workers:
+    count: ${WORKER_COUNT:4}
+  retry:
+    max-attempts: ${MAX_ATTEMPTS:4}
+    initial-backoff-ms: ${INITIAL_BACKOFF_MS:250}
+  reconciliation:
+    interval-ms: ${RECONCILIATION_INTERVAL_MS:5000}
+    stale-after: ${RECONCILIATION_STALE_AFTER:5s}
