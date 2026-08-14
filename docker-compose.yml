@@ -1,0 +1,15 @@
+services:
+  event-platform:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      WORKER_COUNT: 4
+      MAX_ATTEMPTS: 4
+      INITIAL_BACKOFF_MS: 250
+      RECONCILIATION_STALE_AFTER: 5s
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
