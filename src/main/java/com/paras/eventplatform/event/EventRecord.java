@@ -12,11 +12,13 @@ public record EventRecord(
         Instant processedAt,
         EventStatus status,
         int attempts,
-        String lastError
+        String lastError,
+        Instant processingStartedAt
 ) {
     public EventRecord withStatus(EventStatus newStatus, int newAttempts, String error) {
         return new EventRecord(eventId, correlationId, eventType, payload, receivedAt,
                 newStatus == EventStatus.PROCESSED ? Instant.now() : processedAt,
-                newStatus, newAttempts, error);
+                newStatus, newAttempts, error,
+                newStatus == EventStatus.PROCESSING ? Instant.now() : null);
     }
 }

@@ -9,7 +9,50 @@ services:
       INITIAL_BACKOFF_MS: 250
       RECONCILIATION_STALE_AFTER: 5s
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
       interval: 10s
       timeout: 3s
       retries: 5
+
+  localstack:
+    image: localstack/localstack:3.8.1
+    profiles: ["aws"]
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: sqs,dynamodb
+      AWS_DEFAULT_REGION: us-east-1
+      LOCALSTACK_HOST: localstack
+      SQS_ENDPOINT_STRATEGY: path
+    volumes:
+      - "./scripts/localstack:/etc/localstack/init/ready.d"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  event-platform-aws:
+    build: .
+    profiles: ["aws"]
+    ports:
+      - "8081:8080"
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: aws
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://localstack:4566
+      EVENT_TABLE_NAME: event-platform-events
+      EVENT_QUEUE_URL: http://localstack:4566/queue/us-east-1/000000000000/event-platform-events
+      DLQ_URL: http://localstack:4566/queue/us-east-1/000000000000/event-platform-dlq
+      PROCESSING_CLAIM_TIMEOUT: 55s
+      WORKER_COUNT: 4
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10

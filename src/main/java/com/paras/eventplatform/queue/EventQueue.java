@@ -1,26 +1,17 @@
 package com.paras.eventplatform.queue;
 
-import org.springframework.stereotype.Component;
+import java.time.Duration;
 
-import java.util.concurrent.DelayQueue;
+public interface EventQueue {
+    void publish(QueuedEvent event);
 
-@Component
-public class EventQueue {
-    private final DelayQueue<QueuedEvent> queue = new DelayQueue<>();
+    QueuedEvent take() throws InterruptedException;
 
-    public void publish(QueuedEvent event) {
-        queue.put(event);
-    }
+    void acknowledge(QueuedEvent event);
 
-    public QueuedEvent take() throws InterruptedException {
-        return queue.take();
-    }
+    void retry(QueuedEvent event, Duration delay);
 
-    public int size() {
-        return queue.size();
-    }
+    int size();
 
-    public void clear() {
-        queue.clear();
-    }
+    void clear();
 }

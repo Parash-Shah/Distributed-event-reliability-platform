@@ -29,7 +29,7 @@ public class EventIngestionService {
         String correlationId = firstNonBlank(requestedCorrelationId, UUID.randomUUID().toString());
         Instant now = Instant.now();
         EventRecord event = new EventRecord(eventId, correlationId, request.eventType(),
-                request.payload(), now, null, EventStatus.RECEIVED, 0, null);
+                request.payload(), now, null, EventStatus.RECEIVED, 0, null, null);
 
         if (!repository.createIfAbsent(event)) {
             duplicateCounter.increment();

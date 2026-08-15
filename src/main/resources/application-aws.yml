@@ -1,0 +1,10 @@
+platform:
+  aws:
+    region: ${AWS_REGION:us-east-1}
+    endpoint: ${AWS_ENDPOINT_URL:}
+    dynamodb:
+      event-table: ${EVENT_TABLE_NAME:event-platform-events}
+    sqs:
+      event-queue-url: ${EVENT_QUEUE_URL}
+      dlq-url: ${DLQ_URL}
+      wait-time-seconds: ${SQS_WAIT_TIME_SECONDS:10}

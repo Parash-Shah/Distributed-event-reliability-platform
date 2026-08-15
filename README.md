@@ -21,12 +21,15 @@ A production-style Java backend designed around failure rather than only the hap
 
 At-least-once queues can redeliver messages. Workers can crash after completing a side effect but before acknowledging it. Dependencies can fail temporarily, poison messages can fail forever, and an event can disappear without producing an error. Success-rate monitoring alone cannot prove that every accepted event was processed.
 
-This project makes those cases observable and testable. The first milestone runs locally with in-memory queue and repository adapters. The Terraform module provisions the corresponding AWS SQS, DLQ, DynamoDB, alarm, and dashboard resources. Connecting the Java adapters to those resources is the next deployment milestone; the README does not claim that the current local process already uses AWS.
+This project makes those cases observable and testable. The default profile uses in-memory adapters for a fast development loop. The `aws` profile uses real AWS SDK adapters for SQS, a dead-letter queue, and DynamoDB; it can run against LocalStack or the Terraform-provisioned AWS resources.
 
 ## Current capabilities
 
 - Java 21 and Spring Boot REST API
-- asynchronous `DelayQueue` with four configurable workers
+- interchangeable local `DelayQueue` and AWS SQS queue adapters
+- DynamoDB conditional writes for durable idempotency and atomic worker claims
+- explicit SQS acknowledgement and visibility-timeout retry semantics
+- expiring processing leases for worker-crash recovery
 - ingestion and worker-side duplicate protection
 - exponential retry delays and a bounded retry count
 - dead-letter queue for permanent failures
@@ -34,7 +37,8 @@ This project makes those cases observable and testable. The first milestone runs
 - scheduled reconciliation of accepted versus processed events
 - Prometheus-format counters, queue gauges, and P50/P95/P99 timer data
 - correlation IDs and structured key/value logs
-- integration tests for success, duplicates, retries, DLQ, and silent loss
+- integration tests for success, duplicates, retries, DLQ, silent loss, and processing leases
+- opt-in LocalStack end-to-end integration test for the AWS adapters
 - multi-stage non-root Docker image
 - Locust workload with duplicate injection
 - Terraform foundation for SQS, DynamoDB, CloudWatch, and the DLQ
@@ -87,7 +91,7 @@ curl http://localhost:8080/api/v1/events/order-123-created
 
 ### 5. Prove idempotency
 
-Send the exact POST again with the same `Idempotency-Key`. The response has `duplicate: true`, the stored event count remains one, and no second work item is published. In AWS, the same rule will be enforced with a DynamoDB conditional write.
+Send the exact POST again with the same `Idempotency-Key`. The response has `duplicate: true`, the stored event count remains one, and no second work item is published. Under the `aws` profile, DynamoDB enforces the same rule with `attribute_not_exists(event_id)`.
 
 ### 6. Exercise failures
 
@@ -144,6 +148,35 @@ docker compose up --build
 
 Stop it with `Ctrl+C`; run `docker compose down` when finished.
 
+### 8a. Run the AWS adapters with LocalStack
+
+This starts LocalStack, creates both queues and the DynamoDB table, then runs the application on port `8081` with the `aws` Spring profile:
+
+```bash
+docker compose --profile aws up --build event-platform-aws
+curl http://localhost:8081/actuator/health
+```
+
+Run the opt-in AWS integration test while LocalStack is running:
+
+```bash
+RUN_LOCALSTACK_TESTS=true \
+AWS_ACCESS_KEY_ID=test \
+AWS_SECRET_ACCESS_KEY=test \
+AWS_REGION=us-east-1 \
+./mvnw test -Dtest=AwsLocalStackIntegrationTest
+```
+
+PowerShell equivalent:
+
+```powershell
+$env:RUN_LOCALSTACK_TESTS="true"
+$env:AWS_ACCESS_KEY_ID="test"
+$env:AWS_SECRET_ACCESS_KEY="test"
+$env:AWS_REGION="us-east-1"
+.\mvnw.cmd test -Dtest=AwsLocalStackIntegrationTest
+```
+
 ### 9. Run the load test
 
 ```bash
@@ -175,7 +208,7 @@ terraform plan
 terraform apply
 ```
 
-`terraform apply` creates billable AWS resources and therefore should only be run in an account and region you intend to use. Add an API/worker compute target and least-privilege IAM policies when replacing the in-memory adapters with AWS SDK implementations.
+`terraform apply` creates billable AWS resources and therefore should only be run in an account and region you intend to use. Activate the adapters with `SPRING_PROFILES_ACTIVE=aws`, then supply `EVENT_QUEUE_URL`, `DLQ_URL`, `EVENT_TABLE_NAME`, and `AWS_REGION`. API/worker compute and least-privilege IAM remain part of the next deployment milestone.
 
 ## Design decisions
 
@@ -195,7 +228,7 @@ terraform apply
 
 **A poison message never succeeds.** After the configured maximum attempts, it is added to the DLQ, its error and attempt count remain queryable, and the DLQ metric/CloudWatch alarm identifies it for investigation.
 
-**A worker crashes.** The production SQS visibility timeout makes the unacknowledged message visible to another worker. The DynamoDB conditional idempotency record prevents a repeated side effect. The in-memory milestone cannot survive a whole-process restart; implementing and testing SQS/DynamoDB adapters is required before claiming this behavior in benchmarks.
+**A worker crashes.** SQS makes the unacknowledged message visible after its visibility timeout. The worker claim in DynamoDB has a shorter lease; after that lease expires, another worker can atomically reclaim the event. If the first worker completed before crashing, the `PROCESSED` state makes the redelivery acknowledge without repeating the side effect.
 
 **An event disappears silently.** No exception means the failure counter stays flat. The independent reconciliation job finds accepted records that did not reach `PROCESSED` before the stale threshold and emits a missing-event gauge and discrepancy log.
 
@@ -204,7 +237,7 @@ terraform apply
 ## Delivery roadmap
 
 1. **Local reliability core — implemented:** API, workers, idempotency, retries, DLQ, metrics, reconciliation, tests, Docker, and load generator.
-2. **AWS adapters:** implement SQS publish/consume and DynamoDB conditional state transitions behind interfaces; use LocalStack for integration tests.
+2. **AWS adapters — implemented:** SQS publish/consume/acknowledge/retry, DynamoDB conditional state transitions, expiring worker leases, an AWS DLQ publisher, and an opt-in LocalStack integration test.
 3. **Compute and IAM:** deploy API and worker containers to ECS Fargate (or API to ECS and reconciliation to Lambda/EventBridge), using separate least-privilege roles.
 4. **Observability:** publish custom CloudWatch metrics, alarms for age/backlog/failures/missing events, and a complete dashboard.
 5. **Failure campaign:** duplicate delivery, terminate a worker during processing, poison messages, throttled dependencies, and silent drops.
@@ -223,4 +256,4 @@ terraform apply
 
 ## Portfolio evidence still to add
 
-Add real dashboard screenshots, a Locust report, exact infrastructure costs, a worker-termination timeline, and measured latency/throughput after the AWS adapters are complete. Those artifacts turn architectural claims into evidence.
+Add real dashboard screenshots, a Locust report, exact infrastructure costs, a worker-termination timeline, and measured latency/throughput after deploying the AWS adapters to managed compute. Those artifacts turn architectural claims into evidence.
