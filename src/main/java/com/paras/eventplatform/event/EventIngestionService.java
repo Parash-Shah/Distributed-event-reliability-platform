@@ -4,12 +4,14 @@ import com.paras.eventplatform.queue.EventQueue;
 import com.paras.eventplatform.queue.QueuedEvent;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Service
+@ConditionalOnExpression("'${platform.runtime.mode:all}' == 'all' || '${platform.runtime.mode:all}' == 'api'")
 public class EventIngestionService {
     private final EventRepository repository;
     private final EventQueue queue;

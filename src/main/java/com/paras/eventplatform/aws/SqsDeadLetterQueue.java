@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.QueueAttributeName;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Profile("aws")
@@ -30,6 +32,7 @@ public class SqsDeadLetterQueue implements DeadLetterQueue {
         this.objectMapper = objectMapper;
         this.queueUrl = queueUrl;
         this.dlqCounter = registry.counter("events.dlq");
+        registry.gauge("events.dlq.depth", this, SqsDeadLetterQueue::depth);
     }
 
     @Override
@@ -55,5 +58,19 @@ public class SqsDeadLetterQueue implements DeadLetterQueue {
         } catch (JsonProcessingException failure) {
             throw new IllegalArgumentException("Dead letter cannot be serialized for SQS", failure);
         }
+    }
+
+    private int depth() {
+        Map<QueueAttributeName, String> attributes = sqs.getQueueAttributes(request -> request
+                        .queueUrl(queueUrl)
+                        .attributeNames(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES,
+                                QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE))
+                .attributes();
+        return parse(attributes.get(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES))
+                + parse(attributes.get(QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE));
+    }
+
+    private int parse(String value) {
+        return value == null ? 0 : Integer.parseInt(value);
     }
 }

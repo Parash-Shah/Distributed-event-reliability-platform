@@ -1,0 +1,16 @@
+﻿{
+    "Attributes": {
+        "ApproximateNumberOfMessages": "2",
+        "ApproximateNumberOfMessagesNotVisible": "0",
+        "ApproximateNumberOfMessagesDelayed": "0",
+        "CreatedTimestamp": "1786827948",
+        "DelaySeconds": "0",
+        "LastModifiedTimestamp": "1786827948",
+        "MaximumMessageSize": "262144",
+        "MessageRetentionPeriod": "1209600",
+        "QueueArn": "arn:aws:sqs:us-east-1:000000000000:event-platform-dlq",
+        "ReceiveMessageWaitTimeSeconds": "0",
+        "VisibilityTimeout": "30",
+        "SqsManagedSseEnabled": "true"
+    }
+}

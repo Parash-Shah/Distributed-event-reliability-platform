@@ -1,0 +1,133 @@
+﻿{
+    "started_at_utc":  "2026-08-15T23:03:02.3721822+00:00",
+    "completed_at_utc":  "2026-08-15T23:10:32.4523988+00:00",
+    "host":  "LocalStack on Docker Desktop",
+    "api":  "http://127.0.0.1:8081",
+    "locust_version":  "2.40.4",
+    "stage_seconds":  30,
+    "ramp_seconds":  5,
+    "worker_replicas":  4,
+    "isolated_state_reset":  true,
+    "results":  [
+                    {
+                        "users":  20,
+                        "worker_replicas":  4,
+                        "configured_duration_seconds":  30,
+                        "total_requests":  1224,
+                        "accepted_events":  1165,
+                        "processed_events":  1165,
+                        "all_accepted_processed":  true,
+                        "accepted_events_per_minute":  2330,
+                        "duplicate_count":  59,
+                        "request_failures":  0,
+                        "request_failure_rate_percent":  0,
+                        "api_latency_ms":  {
+                                               "p50":  300,
+                                               "p95":  650,
+                                               "p99":  5100
+                                           },
+                        "processing_latency_ms":  {
+                                                      "p50":  31499.89,
+                                                      "p95":  38563.093,
+                                                      "p99":  39755.212
+                                                  },
+                        "processing_latency_source":  "persisted received_at-to-processed_at nearest-rank percentile",
+                        "processing_latency_sample_count":  1165,
+                        "all_accepted_have_processing_latency":  true,
+                        "maximum_queue_backlog":  1014,
+                        "backlog_drained":  true,
+                        "backlog_drain_seconds":  39.024,
+                        "locust_html_report":  "users-20.html"
+                    },
+                    {
+                        "users":  50,
+                        "worker_replicas":  4,
+                        "configured_duration_seconds":  30,
+                        "total_requests":  1564,
+                        "accepted_events":  1487,
+                        "processed_events":  1487,
+                        "all_accepted_processed":  true,
+                        "accepted_events_per_minute":  2974,
+                        "duplicate_count":  77,
+                        "request_failures":  0,
+                        "request_failure_rate_percent":  0,
+                        "api_latency_ms":  {
+                                               "p50":  700,
+                                               "p95":  1500,
+                                               "p99":  4800
+                                           },
+                        "processing_latency_ms":  {
+                                                      "p50":  38959.833,
+                                                      "p95":  46998.164,
+                                                      "p99":  48027.334
+                                                  },
+                        "processing_latency_source":  "persisted received_at-to-processed_at nearest-rank percentile",
+                        "processing_latency_sample_count":  1487,
+                        "all_accepted_have_processing_latency":  true,
+                        "maximum_queue_backlog":  1369,
+                        "backlog_drained":  true,
+                        "backlog_drain_seconds":  47.946,
+                        "locust_html_report":  "users-50.html"
+                    },
+                    {
+                        "users":  100,
+                        "worker_replicas":  4,
+                        "configured_duration_seconds":  30,
+                        "total_requests":  2039,
+                        "accepted_events":  1955,
+                        "processed_events":  1955,
+                        "all_accepted_processed":  true,
+                        "accepted_events_per_minute":  3910,
+                        "duplicate_count":  84,
+                        "request_failures":  0,
+                        "request_failure_rate_percent":  0,
+                        "api_latency_ms":  {
+                                               "p50":  1300,
+                                               "p95":  2500,
+                                               "p99":  3100
+                                           },
+                        "processing_latency_ms":  {
+                                                      "p50":  52083.595,
+                                                      "p95":  72190.816,
+                                                      "p99":  73561.215
+                                                  },
+                        "processing_latency_source":  "persisted received_at-to-processed_at nearest-rank percentile",
+                        "processing_latency_sample_count":  1955,
+                        "all_accepted_have_processing_latency":  true,
+                        "maximum_queue_backlog":  1838,
+                        "backlog_drained":  true,
+                        "backlog_drain_seconds":  73.75,
+                        "locust_html_report":  "users-100.html"
+                    },
+                    {
+                        "users":  250,
+                        "worker_replicas":  4,
+                        "configured_duration_seconds":  30,
+                        "total_requests":  1818,
+                        "accepted_events":  1726,
+                        "processed_events":  1726,
+                        "all_accepted_processed":  true,
+                        "accepted_events_per_minute":  3452,
+                        "duplicate_count":  92,
+                        "request_failures":  0,
+                        "request_failure_rate_percent":  0,
+                        "api_latency_ms":  {
+                                               "p50":  3300,
+                                               "p95":  8800,
+                                               "p99":  12000
+                                           },
+                        "processing_latency_ms":  {
+                                                      "p50":  51168.726,
+                                                      "p95":  62690.81,
+                                                      "p99":  67461.713
+                                                  },
+                        "processing_latency_source":  "persisted received_at-to-processed_at nearest-rank percentile",
+                        "processing_latency_sample_count":  1726,
+                        "all_accepted_have_processing_latency":  true,
+                        "maximum_queue_backlog":  1626,
+                        "backlog_drained":  true,
+                        "backlog_drain_seconds":  58.796,
+                        "locust_html_report":  "users-250.html"
+                    }
+                ]
+}

@@ -5,6 +5,19 @@ spring:
     property-naming-strategy: SNAKE_CASE
 
 management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      component: ${PLATFORM_MODE:all}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        events.processing.latency: true
+      maximum-expected-value:
+        events.processing.latency: 5m
+      percentiles:
+        http.server.requests: 0.5,0.95,0.99
+        events.processing.latency: 0.5,0.95,0.99
   endpoints:
     web:
       exposure:
@@ -14,6 +27,8 @@ management:
       show-details: always
 
 platform:
+  runtime:
+    mode: ${PLATFORM_MODE:all}
   processing:
     claim-timeout: ${PROCESSING_CLAIM_TIMEOUT:55s}
   workers:

@@ -1,0 +1,17 @@
+﻿{
+    "Attributes": {
+        "ApproximateNumberOfMessages": "0",
+        "ApproximateNumberOfMessagesNotVisible": "0",
+        "ApproximateNumberOfMessagesDelayed": "0",
+        "CreatedTimestamp": "1786827948",
+        "DelaySeconds": "0",
+        "LastModifiedTimestamp": "1786827948",
+        "MaximumMessageSize": "262144",
+        "MessageRetentionPeriod": "345600",
+        "QueueArn": "arn:aws:sqs:us-east-1:000000000000:event-platform-events",
+        "ReceiveMessageWaitTimeSeconds": "0",
+        "VisibilityTimeout": "10",
+        "SqsManagedSseEnabled": "true",
+        "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:us-east-1:000000000000:event-platform-dlq\",\"maxReceiveCount\":\"4\"}"
+    }
+}

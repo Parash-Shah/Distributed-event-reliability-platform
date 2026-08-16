@@ -3,6 +3,7 @@ package com.paras.eventplatform.event;
 import com.paras.eventplatform.dlq.DeadLetter;
 import com.paras.eventplatform.dlq.DeadLetterQueue;
 import jakarta.validation.Valid;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@ConditionalOnExpression("'${platform.runtime.mode:all}' == 'all' || '${platform.runtime.mode:all}' == 'api'")
 public class EventController {
     private final EventIngestionService ingestionService;
     private final EventRepository repository;

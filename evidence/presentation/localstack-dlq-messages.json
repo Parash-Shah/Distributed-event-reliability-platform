@@ -1,0 +1,28 @@
+﻿{
+    "Messages": [
+        {
+            "MessageId": "db82ecb8-65e3-4ea5-8c98-bf5050d1fbc3",
+            "ReceiptHandle": "MjRmNmQ5Y2ItN2FlNy00ZWZlLWFjOTktZGNhYzQ4NWEzMDI1IGFybjphd3M6c3FzOnVzLWVhc3QtMTowMDAwMDAwMDAwMDA6ZXZlbnQtcGxhdGZvcm0tZGxxIGRiODJlY2I4LTY1ZTMtNGVhNS04Yzk4LWJmNTA1MGQxZmJjMyAxNzg2ODM2NzY2LjE2MDYzOTU=",
+            "MD5OfBody": "7ff92b3e61824d9cee0cce3292162a4b",
+            "Body": "{\"event\":{\"event_id\":\"poison-70dce50e-0392-455f-8777-1a5e3ad8d184\",\"correlation_id\":\"8296e90d-770c-4c43-ab63-9b0e36dab22f\",\"event_type\":\"POISON\",\"payload\":{},\"received_at\":\"2026-08-15T23:19:12.830842600Z\",\"processed_at\":null,\"status\":\"FAILED\",\"attempts\":3,\"last_error\":\"Injected failure for POISON\",\"processing_started_at\":null},\"attempts\":3,\"error\":\"Injected failure for POISON\",\"failed_at\":\"2026-08-15T23:19:16.992099800Z\"}",
+            "Attributes": {
+                "SenderId": "000000000000",
+                "SentTimestamp": "1786835957001",
+                "ApproximateReceiveCount": "4",
+                "ApproximateFirstReceiveTimestamp": "1786836271970"
+            }
+        },
+        {
+            "MessageId": "a203b40e-e972-467a-a11f-3b503c060ce0",
+            "ReceiptHandle": "MDU0ODFiNTItNDFhNC00MzY5LThjODUtN2YzYmM2ZWYwMjVlIGFybjphd3M6c3FzOnVzLWVhc3QtMTowMDAwMDAwMDAwMDA6ZXZlbnQtcGxhdGZvcm0tZGxxIGEyMDNiNDBlLWU5NzItNDY3YS1hMTFmLTNiNTAzYzA2MGNlMCAxNzg2ODM2NzY2LjE2MDg4Mw==",
+            "MD5OfBody": "a5ab96e70ef6d0a89c371546e4fca06e",
+            "Body": "{\"event\":{\"event_id\":\"monitoring-1786836023410-poison\",\"correlation_id\":\"c548bf21-115c-455a-bd90-4d96570ea9da\",\"event_type\":\"POISON\",\"payload\":{\"campaign\":\"monitoring-1786836023410\"},\"received_at\":\"2026-08-15T23:20:23.454916174Z\",\"processed_at\":null,\"status\":\"FAILED\",\"attempts\":4,\"last_error\":\"Injected failure for POISON\",\"processing_started_at\":null},\"attempts\":4,\"error\":\"Injected failure for POISON\",\"failed_at\":\"2026-08-15T23:20:28.974612945Z\"}",
+            "Attributes": {
+                "SenderId": "000000000000",
+                "SentTimestamp": "1786836028989",
+                "ApproximateReceiveCount": "4",
+                "ApproximateFirstReceiveTimestamp": "1786836271971"
+            }
+        }
+    ]
+}

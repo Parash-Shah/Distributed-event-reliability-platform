@@ -14,6 +14,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Component
+@ConditionalOnExpression("'${platform.runtime.mode:all}' == 'all' || '${platform.runtime.mode:all}' == 'worker'")
 public class EventProcessor {
     private static final Logger log = LoggerFactory.getLogger(EventProcessor.class);
 
@@ -117,6 +119,7 @@ public class EventProcessor {
         }
 
         try {
+            failureInjector.delayIfRequested(current);
             FailureInjector.ProcessingDecision decision = failureInjector.evaluate(current, queued.attempt());
             if (decision == FailureInjector.ProcessingDecision.DROP) {
                 queue.acknowledge(queued);
@@ -128,6 +131,11 @@ public class EventProcessor {
             }
 
             repository.update(current.eventId(), EventStatus.PROCESSED, queued.attempt(), null);
+        } catch (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+            log.warn("event_processing_interrupted event_id={} correlation_id={} attempt={}",
+                    current.eventId(), current.correlationId(), queued.attempt());
+            return;
         } catch (StaleEventClaimException staleClaim) {
             log.warn("event_claim_lost event_id={} correlation_id={} attempt={}",
                     current.eventId(), current.correlationId(), queued.attempt());

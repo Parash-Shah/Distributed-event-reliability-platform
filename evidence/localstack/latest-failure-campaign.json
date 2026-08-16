@@ -1,0 +1,23 @@
+﻿{
+    "started_at_utc":  "2026-08-15T23:18:34.1855435+00:00",
+    "completed_at_utc":  "2026-08-15T23:20:29.8809077+00:00",
+    "localstack_adapter_tests":  "passed",
+    "isolated_state_reset":  true,
+    "worker_termination_recovery":  "passed",
+    "backlog":  {
+                    "submitted_events":  50,
+                    "maximum_queue_depth":  50,
+                    "processed_events":  50,
+                    "drain_seconds":  12.029
+                },
+    "monitoring":  {
+                       "grafana":  "http://127.0.0.1:3000/d/event-platform-overview/distributed-event-platform-overview",
+                       "prometheus":  "http://127.0.0.1:9090/query",
+                       "alertmanager":  "http://127.0.0.1:9093",
+                       "seeded_event_ids":  {
+                                                "transient":  "monitoring-1786836023410-transient",
+                                                "poison":  "monitoring-1786836023410-poison",
+                                                "silent_drop":  "monitoring-1786836023410-silent"
+                                            }
+                   }
+}

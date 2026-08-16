@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Event Platform
+    orgId: 1
+    folder: Event Platform
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards

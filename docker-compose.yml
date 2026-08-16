@@ -1,3 +1,15 @@
+x-aws-environment: &aws-environment
+  SPRING_PROFILES_ACTIVE: aws
+  AWS_ACCESS_KEY_ID: test
+  AWS_SECRET_ACCESS_KEY: test
+  AWS_REGION: us-east-1
+  AWS_ENDPOINT_URL: http://localstack:4566
+  EVENT_TABLE_NAME: event-platform-events
+  EVENT_QUEUE_URL: http://localstack:4566/queue/us-east-1/000000000000/event-platform-events
+  DLQ_URL: http://localstack:4566/queue/us-east-1/000000000000/event-platform-dlq
+  PROCESSING_CLAIM_TIMEOUT: 5s
+  SQS_WAIT_TIME_SECONDS: 1
+
 services:
   event-platform:
     build: .
@@ -41,18 +53,114 @@ services:
       localstack:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: aws
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
-      AWS_REGION: us-east-1
-      AWS_ENDPOINT_URL: http://localstack:4566
-      EVENT_TABLE_NAME: event-platform-events
-      EVENT_QUEUE_URL: http://localstack:4566/queue/us-east-1/000000000000/event-platform-events
-      DLQ_URL: http://localstack:4566/queue/us-east-1/000000000000/event-platform-dlq
-      PROCESSING_CLAIM_TIMEOUT: 55s
-      WORKER_COUNT: 4
+      <<: *aws-environment
+      PLATFORM_MODE: api
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
       interval: 10s
       timeout: 3s
       retries: 10
+
+  event-worker-aws:
+    build: .
+    profiles: ["aws"]
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      <<: *aws-environment
+      PLATFORM_MODE: worker
+      WORKER_COUNT: 1
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  event-reconciliation-aws:
+    build: .
+    profiles: ["aws"]
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      <<: *aws-environment
+      PLATFORM_MODE: reconciliation
+      RECONCILIATION_STALE_AFTER: 15s
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  prometheus:
+    image: prom/prometheus:v3.13.1
+    profiles: ["monitoring"]
+    depends_on:
+      event-platform-aws:
+        condition: service_healthy
+      event-worker-aws:
+        condition: service_healthy
+      event-reconciliation-aws:
+        condition: service_healthy
+      alertmanager:
+        condition: service_started
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
+      - --web.enable-lifecycle
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - "./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+      - "./monitoring/prometheus/rules:/etc/prometheus/rules:ro"
+      - "prometheus-data:/prometheus"
+
+  alertmanager:
+    image: prom/alertmanager:v0.33.1
+    profiles: ["monitoring"]
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    ports:
+      - "127.0.0.1:9093:9093"
+    volumes:
+      - "./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro"
+      - "alertmanager-data:/alertmanager"
+
+  grafana:
+    image: grafana/grafana:13.1.0
+    profiles: ["monitoring"]
+    depends_on:
+      prometheus:
+        condition: service_started
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/event-platform-overview.json
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - "./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro"
+      - "./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro"
+      - "grafana-data:/var/lib/grafana"
+
+  locust:
+    image: locustio/locust:2.40.4
+    profiles: ["load"]
+    working_dir: /mnt/locust
+    depends_on:
+      event-platform-aws:
+        condition: service_healthy
+    volumes:
+      - "./load-tests:/mnt/locust:ro"
+      - "./evidence/load-tests:/mnt/evidence"
+
+volumes:
+  prometheus-data:
+  alertmanager-data:
+  grafana-data:

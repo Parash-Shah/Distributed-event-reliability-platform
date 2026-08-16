@@ -14,7 +14,7 @@ awslocal sqs create-queue \
 
 DLQ_ARN="arn:aws:sqs:${REGION}:${ACCOUNT_ID}:${DLQ_NAME}"
 QUEUE_ATTRIBUTES=$(printf \
-  '{"VisibilityTimeout":"60","RedrivePolicy":"{\\"deadLetterTargetArn\\":\\"%s\\",\\"maxReceiveCount\\":\\"4\\"}"}' \
+  '{"VisibilityTimeout":"10","RedrivePolicy":"{\\"deadLetterTargetArn\\":\\"%s\\",\\"maxReceiveCount\\":\\"4\\"}"}' \
   "$DLQ_ARN")
 
 awslocal sqs create-queue \

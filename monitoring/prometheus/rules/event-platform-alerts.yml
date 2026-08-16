@@ -1,0 +1,61 @@
+groups:
+  - name: event-platform
+    rules:
+      - alert: EventWorkerTargetDown
+        expr: up{job="event-workers"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: Event worker target is unavailable
+          description: Prometheus has been unable to scrape an event worker for 30 seconds.
+
+      - alert: EventQueueBacklogHigh
+        expr: max(events_queue_depth) > 100
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Event queue backlog is high
+          description: More than 100 events have remained queued or in flight for two minutes.
+
+      - alert: EventDlqNotEmpty
+        expr: max(events_dlq_depth) > 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: Dead-letter queue contains events
+          description: At least one permanently failed event is present in the DLQ.
+
+      - alert: MissingEventsDetected
+        expr: max(events_reconciliation_missing) > 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: Reconciliation found missing events
+          description: Accepted events have not reached PROCESSED within the configured stale window.
+
+      - alert: EventFailureRateHigh
+        expr: |
+          sum(rate(events_failed_total[2m]))
+            / clamp_min(sum(rate(events_received_total[2m])), 0.001) > 0.10
+          and sum(rate(events_received_total[2m])) > 0.05
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: Event failure rate exceeds 10 percent
+          description: Worker failures are elevated relative to accepted traffic.
+
+      - alert: ProcessingLatencyP95High
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(events_processing_latency_seconds_bucket[5m]))) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Processing P95 latency exceeds five seconds
+          description: End-to-end event processing latency has remained high for two minutes.

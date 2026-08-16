@@ -1,0 +1,69 @@
+﻿<!doctype html>
+<html><head><meta charset="utf-8"><title>LocalStack Queue and DLQ Evidence</title><style>
+body{margin:0;padding:28px;background:#0b0f14;color:#e6edf3;font:16px/1.45 Consolas,monospace}
+h1{font:700 30px Segoe UI,sans-serif;margin:0 0 22px;color:#f0f6fc}
+h2{font:600 19px Segoe UI,sans-serif;margin:0 0 12px;color:#58a6ff}
+section{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:18px;margin:0 0 18px}
+pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;color:#c9d1d9}
+.stamp{color:#8b949e;font:14px Segoe UI,sans-serif;margin-bottom:20px}
+</style></head><body><h1>LocalStack Queue and DLQ Evidence</h1><div class="stamp">Captured 2026-08-15 19:32:48 -04:00 from the live LocalStack stack</div><section><h2>Event queue attributes</h2><pre>{
+    &quot;Attributes&quot;: {
+        &quot;ApproximateNumberOfMessages&quot;: &quot;0&quot;,
+        &quot;ApproximateNumberOfMessagesNotVisible&quot;: &quot;0&quot;,
+        &quot;ApproximateNumberOfMessagesDelayed&quot;: &quot;0&quot;,
+        &quot;CreatedTimestamp&quot;: &quot;1786827948&quot;,
+        &quot;DelaySeconds&quot;: &quot;0&quot;,
+        &quot;LastModifiedTimestamp&quot;: &quot;1786827948&quot;,
+        &quot;MaximumMessageSize&quot;: &quot;262144&quot;,
+        &quot;MessageRetentionPeriod&quot;: &quot;345600&quot;,
+        &quot;QueueArn&quot;: &quot;arn:aws:sqs:us-east-1:000000000000:event-platform-events&quot;,
+        &quot;ReceiveMessageWaitTimeSeconds&quot;: &quot;0&quot;,
+        &quot;VisibilityTimeout&quot;: &quot;10&quot;,
+        &quot;SqsManagedSseEnabled&quot;: &quot;true&quot;,
+        &quot;RedrivePolicy&quot;: &quot;{\&quot;deadLetterTargetArn\&quot;:\&quot;arn:aws:sqs:us-east-1:000000000000:event-platform-dlq\&quot;,\&quot;maxReceiveCount\&quot;:\&quot;4\&quot;}&quot;
+    }
+}</pre></section>
+<section><h2>Dead-letter queue attributes</h2><pre>{
+    &quot;Attributes&quot;: {
+        &quot;ApproximateNumberOfMessages&quot;: &quot;2&quot;,
+        &quot;ApproximateNumberOfMessagesNotVisible&quot;: &quot;0&quot;,
+        &quot;ApproximateNumberOfMessagesDelayed&quot;: &quot;0&quot;,
+        &quot;CreatedTimestamp&quot;: &quot;1786827948&quot;,
+        &quot;DelaySeconds&quot;: &quot;0&quot;,
+        &quot;LastModifiedTimestamp&quot;: &quot;1786827948&quot;,
+        &quot;MaximumMessageSize&quot;: &quot;262144&quot;,
+        &quot;MessageRetentionPeriod&quot;: &quot;1209600&quot;,
+        &quot;QueueArn&quot;: &quot;arn:aws:sqs:us-east-1:000000000000:event-platform-dlq&quot;,
+        &quot;ReceiveMessageWaitTimeSeconds&quot;: &quot;0&quot;,
+        &quot;VisibilityTimeout&quot;: &quot;30&quot;,
+        &quot;SqsManagedSseEnabled&quot;: &quot;true&quot;
+    }
+}</pre></section>
+<section><h2>Dead-letter queue messages</h2><pre>{
+    &quot;Messages&quot;: [
+        {
+            &quot;MessageId&quot;: &quot;db82ecb8-65e3-4ea5-8c98-bf5050d1fbc3&quot;,
+            &quot;ReceiptHandle&quot;: &quot;MjRmNmQ5Y2ItN2FlNy00ZWZlLWFjOTktZGNhYzQ4NWEzMDI1IGFybjphd3M6c3FzOnVzLWVhc3QtMTowMDAwMDAwMDAwMDA6ZXZlbnQtcGxhdGZvcm0tZGxxIGRiODJlY2I4LTY1ZTMtNGVhNS04Yzk4LWJmNTA1MGQxZmJjMyAxNzg2ODM2NzY2LjE2MDYzOTU=&quot;,
+            &quot;MD5OfBody&quot;: &quot;7ff92b3e61824d9cee0cce3292162a4b&quot;,
+            &quot;Body&quot;: &quot;{\&quot;event\&quot;:{\&quot;event_id\&quot;:\&quot;poison-70dce50e-0392-455f-8777-1a5e3ad8d184\&quot;,\&quot;correlation_id\&quot;:\&quot;8296e90d-770c-4c43-ab63-9b0e36dab22f\&quot;,\&quot;event_type\&quot;:\&quot;POISON\&quot;,\&quot;payload\&quot;:{},\&quot;received_at\&quot;:\&quot;2026-08-15T23:19:12.830842600Z\&quot;,\&quot;processed_at\&quot;:null,\&quot;status\&quot;:\&quot;FAILED\&quot;,\&quot;attempts\&quot;:3,\&quot;last_error\&quot;:\&quot;Injected failure for POISON\&quot;,\&quot;processing_started_at\&quot;:null},\&quot;attempts\&quot;:3,\&quot;error\&quot;:\&quot;Injected failure for POISON\&quot;,\&quot;failed_at\&quot;:\&quot;2026-08-15T23:19:16.992099800Z\&quot;}&quot;,
+            &quot;Attributes&quot;: {
+                &quot;SenderId&quot;: &quot;000000000000&quot;,
+                &quot;SentTimestamp&quot;: &quot;1786835957001&quot;,
+                &quot;ApproximateReceiveCount&quot;: &quot;4&quot;,
+                &quot;ApproximateFirstReceiveTimestamp&quot;: &quot;1786836271970&quot;
+            }
+        },
+        {
+            &quot;MessageId&quot;: &quot;a203b40e-e972-467a-a11f-3b503c060ce0&quot;,
+            &quot;ReceiptHandle&quot;: &quot;MDU0ODFiNTItNDFhNC00MzY5LThjODUtN2YzYmM2ZWYwMjVlIGFybjphd3M6c3FzOnVzLWVhc3QtMTowMDAwMDAwMDAwMDA6ZXZlbnQtcGxhdGZvcm0tZGxxIGEyMDNiNDBlLWU5NzItNDY3YS1hMTFmLTNiNTAzYzA2MGNlMCAxNzg2ODM2NzY2LjE2MDg4Mw==&quot;,
+            &quot;MD5OfBody&quot;: &quot;a5ab96e70ef6d0a89c371546e4fca06e&quot;,
+            &quot;Body&quot;: &quot;{\&quot;event\&quot;:{\&quot;event_id\&quot;:\&quot;monitoring-1786836023410-poison\&quot;,\&quot;correlation_id\&quot;:\&quot;c548bf21-115c-455a-bd90-4d96570ea9da\&quot;,\&quot;event_type\&quot;:\&quot;POISON\&quot;,\&quot;payload\&quot;:{\&quot;campaign\&quot;:\&quot;monitoring-1786836023410\&quot;},\&quot;received_at\&quot;:\&quot;2026-08-15T23:20:23.454916174Z\&quot;,\&quot;processed_at\&quot;:null,\&quot;status\&quot;:\&quot;FAILED\&quot;,\&quot;attempts\&quot;:4,\&quot;last_error\&quot;:\&quot;Injected failure for POISON\&quot;,\&quot;processing_started_at\&quot;:null},\&quot;attempts\&quot;:4,\&quot;error\&quot;:\&quot;Injected failure for POISON\&quot;,\&quot;failed_at\&quot;:\&quot;2026-08-15T23:20:28.974612945Z\&quot;}&quot;,
+            &quot;Attributes&quot;: {
+                &quot;SenderId&quot;: &quot;000000000000&quot;,
+                &quot;SentTimestamp&quot;: &quot;1786836028989&quot;,
+                &quot;ApproximateReceiveCount&quot;: &quot;4&quot;,
+                &quot;ApproximateFirstReceiveTimestamp&quot;: &quot;1786836271971&quot;
+            }
+        }
+    ]
+}</pre></section></body></html>
